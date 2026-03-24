@@ -1,5 +1,7 @@
 package org.thgcastro.usuario.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -7,19 +9,25 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.thgcastro.usuario.business.UsuarioService;
+import org.thgcastro.usuario.business.ViaCepService;
 import org.thgcastro.usuario.business.dto.EnderecoDTO;
 import org.thgcastro.usuario.business.dto.TelefoneDTO;
 import org.thgcastro.usuario.business.dto.UsuarioDTO;
+import org.thgcastro.usuario.client.ViaCepDTO;
 import org.thgcastro.usuario.infrastructure.security.JwtUtil;
+import org.thgcastro.usuario.infrastructure.security.SecurityConfig;
 
 @RestController
 @RequestMapping("/usuario")
 @RequiredArgsConstructor
+@Tag(name = "Tarefas", description = "Cadastra tarefas de usuários")
+@SecurityRequirement(name = SecurityConfig.SECURITY_SCHEME)
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final ViaCepService viaCepService;
 
     @PostMapping
     public ResponseEntity<UsuarioDTO> savaUsuario(@RequestBody UsuarioDTO usuarioDTO){
@@ -73,5 +81,10 @@ public class UsuarioController {
     public ResponseEntity<TelefoneDTO> cadastraTelefone(@RequestBody TelefoneDTO dto,
                                                         @RequestHeader("Authorization") String token){
         return ResponseEntity.ok(usuarioService.cadastraTelefone(token, dto));
+    }
+
+    @GetMapping("/endereco/{cep}")
+    public ResponseEntity<ViaCepDTO> buscarDadosCep(@PathVariable String cep){
+        return ResponseEntity.ok(viaCepService.buscarDadosEndereco(cep));
     }
 }
